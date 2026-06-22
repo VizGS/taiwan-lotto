@@ -1,0 +1,195 @@
+/* 台灣彩券開獎查詢純靜態版共用樣式
+ * 由原各 view 的 inline <style> 整併而來。
+ * 動態數值（body 字級、表格寬高 %）由 app.js 以 inline style 設定。 */
+
+body {
+  margin: 0;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+/* 表格較寬時只讓表格本身水平捲動，不讓整頁橫捲（手機友善） */
+#app {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  margin: 0 auto;              /* 等同原 align="center" */
+  border-collapse: collapse;   /* 等同 cellspacing=0 + rules=all */
+}
+
+td,
+th {
+  border: 2px solid #999;      /* 等同原 td { border: 2px solid #999 } */
+}
+
+/* 上方四個彩種切換鈕 */
+.category {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: #72a4d7;
+  color: #fff;
+  font-family: "Microsoft JhengHei", sans-serif;
+  cursor: pointer;
+}
+
+/* 查詢表單 */
+.form-cell {
+  text-align: center;
+}
+
+.form-cell input[type="number"] {
+  width: 50px;
+}
+
+.summary {
+  text-align: center;
+}
+
+.summary b {
+  color: #008000;
+}
+
+/* 號碼表頭列 */
+.num-header {
+  background-color: #ff0000;
+  color: #fff;
+  text-align: center;
+}
+
+.num-header--second {
+  background-color: #0033ff;
+}
+
+/* 開獎號碼格 */
+.cell {
+  text-align: center;
+}
+
+.cell--hit {
+  background-color: #99ff33;
+}
+
+.cell--special {          /* 大樂透特別號 */
+  background-color: #0033ff;
+  color: #fff;
+}
+
+.cell--second {           /* 威力彩第二區號 */
+  background-color: #ff0099;
+  color: #fff;
+}
+
+/* 期別列 hover（取代原 inline onmouseover/onmouseout） */
+.period-row:hover {
+  background-color: #ffff00;
+}
+
+/* 標注號碼列 */
+.chk-label {
+  background-color: #efefef;
+  text-align: center;
+}
+
+.chk {
+  text-align: center;
+  cursor: pointer;
+}
+
+.chk--second {
+  background-color: #0033ff;
+  color: #fff;
+}
+
+.chk p {
+  margin: 0;
+}
+
+/* 點選標注後反白（取代原 .active） */
+.active {
+  background-color: #ff0000;
+  color: #fff;
+}
+
+/* 出現次數列 + 直方圖 bar（取代原 GD 產生的 PNG） */
+.count-cell {
+  background-color: #fff;
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.count-label {
+  text-align: center;
+}
+
+.count-label b {
+  color: red;
+}
+
+.bar {
+  width: 10px;
+  margin: 0 auto;
+  /* height 與 background 由 app.js 依 round(count / 20 * 100) * 2 設定 */
+}
+
+/* 無障礙：視覺隱藏但保留給螢幕報讀 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 載入 / 錯誤三態 */
+.status {
+  text-align: center;
+  padding: 1.5em;
+  font-size: 20px;
+}
+
+.status--error {
+  color: #c00;
+}
+
+.status button {
+  margin-left: 0.5em;
+}
+
+/* ===== 四星彩專屬 ===== */
+.lotto4 thead th {
+  width: 100px;
+  height: 100px;
+}
+
+.lotto4 tbody td {
+  width: 100px;
+  height: 100px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.digit-cell {
+  color: red;
+  font-size: 100px;
+  text-align: center;
+}
+
+.period-cell {
+  text-align: center;
+  font-size: 18px;
+}
+
+.inputNumber {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  font-size: 100px;
+  text-align: center;
+  padding: 0;
+}
