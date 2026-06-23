@@ -8,9 +8,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// ── readParams 讀 window.location.search；node 環境補最小 stub，讓 require() 不爆炸。
+// ── readParams 依賴 window.location / window.matchMedia；
+//    在 node 環境補最小 stub，讓 require() 不爆炸。
 globalThis.window = {
   location: { search: '' },
+  matchMedia: () => ({ matches: false }),
 };
 
 const {
