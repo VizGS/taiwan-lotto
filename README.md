@@ -49,8 +49,7 @@ images/404.png          404 圖
 ## 注意事項與已知限制
 
 - **非官方 API 依賴**：`api.taiwanlottery.com/TLCAPIWeB/*` 是台彩官網的內部 API，無公開文件與版本承諾。回應格式、網址或 CORS 政策皆可能被官方單方變動。目前 API 回應 `access-control-allow-origin: *`，瀏覽器可跨域取用；**若官方收緊 CORS，純靜態版將無法繞過，需改用後端 proxy（如 Cloudflare Worker）**。
-- **直方圖高度分母**：出現次數的直方圖（`assets/app.js` 的 `BAR_DIVISOR`）目前固定以 `20` 為分母，這是忠實重現原 CodeIgniter 版的行為（原碼 `max_results` 參數被 controller 簽章吃掉）。若要讓 bar 高度隨查詢筆數縮放，把 `BAR_DIVISOR` 改為實際 `max_results` 即可。
-- 四星彩無號碼出現次數統計與直方圖（沿用原版）。
+- 四星彩無號碼出現次數統計與直方圖。
 
 ## 開發 / 測試
 

@@ -2,8 +2,8 @@
 
 /*
  * 台灣彩券開獎查詢純靜態版核心邏輯
- * 取代原 CodeIgniter 後端：瀏覽器直接 fetch 台灣彩券官方 API，
- * 前端統計號碼出現次數並渲染表格，直方圖以 CSS <div> 取代原 GD PNG。
+ * 瀏覽器直接 fetch 台灣彩券官方 API，前端統計號碼出現次數並渲染表格，
+ * 直方圖以 CSS <div> 繪製。
  *
  * 注意：api.taiwanlottery.com/TLCAPIWeB/* 為台彩官網「非公開」內部 API，
  * 無公開文件與版本承諾；若官方收緊 CORS 或改格式，靜態版無後端 proxy 可緩衝。
@@ -11,9 +11,7 @@
 
 const API_BASE = 'https://api.taiwanlottery.com/TLCAPIWeB/Lottery';
 
-// 直方圖高度分母：忠實重現原碼行為。
-// 原 Chart->index($count, $corder, $max_results='20') 因 controller 簽章只收 $count，
-// max_results 被吃掉，bar 高度一律以 20 為分母（round(count / 20 * 100) * 2）。
+// barHeightPx 用的固定分母（現行渲染改用等比 barHeight；保留供單元測試）
 const BAR_DIVISOR = 20;
 const BAR_COLOR_MAIN = '800080';   // 第一區（紫）
 const BAR_COLOR_SECOND = '000080'; // 威力彩第二區（深藍）
@@ -85,7 +83,7 @@ const GAMES = {
 
 // ===== 工具 =====
 function pad2(n) {
-  return String(n).padStart(2, '0'); // 取代 sprintf('%02d')
+  return String(n).padStart(2, '0');
 }
 
 function range1(max) {
@@ -103,7 +101,7 @@ function escapeHtml(value) {
   ));
 }
 
-// 等價 PHP array_count_values
+// 計算每個值的出現次數
 function countValues(numbers) {
   const counts = {};
   for (const n of numbers) {
@@ -162,7 +160,7 @@ async function fetchPeriods(game, maxResults) {
     const monthData = await fetchMonth(game, month, remaining);
 
     if (monthData.length === 0) {
-      break; // 空月份 → 已到歷史起點，停止（終止守衛，取代原本只靠 PHP timeout）
+      break; // 空月份 → 已到歷史起點，停止（終止守衛，防無限迴圈）
     }
 
     raw.push(...monthData);
@@ -179,7 +177,7 @@ function mapPeriods(game, raw) {
     const code = item.drawNumberAppear.slice();
     const date = String(item.lotteryDate).slice(0, 10); // 取 ISO 的 Y-m-d，不受時區影響
     if (game.secondMax > 0) {
-      const second = code.pop(); // 等價 array_pop：最後一碼為第二區號
+      const second = code.pop(); // 最後一碼為第二區號（威力彩）
       return { period: item.period, code, second, date };
     }
     return { period: item.period, code, date };
@@ -252,7 +250,7 @@ function renderStandard(game, viewPeriod, counts, params) {
   const main = range1(game.mainMax);
   const second = range1(game.secondMax);
   const totalCols = 1 + game.mainMax + game.secondMax;
-  const displayRows = viewPeriod.slice().reverse(); // 比對原 view 的 foreach(array_reverse($period))
+  const displayRows = viewPeriod.slice().reverse(); // 顯示順序由舊到新（資料為新→舊）
 
   const rows = [];
   rows.push(navRowHtml(game, totalCols));
@@ -298,7 +296,7 @@ function renderStandard(game, viewPeriod, counts, params) {
 
 // ===== 四星彩 =====
 function renderLotto4(game, viewPeriod, params) {
-  const displayRows = viewPeriod.slice().reverse(); // 比對原 view 的 foreach(array_reverse($period))
+  const displayRows = viewPeriod.slice().reverse(); // 顯示順序由舊到新（資料為新→舊）
   const totalCols = 5;
 
   const navCells = NAV.map((n) => (
@@ -353,8 +351,7 @@ async function loadAndRender(game) {
   try {
     const raw = await fetchPeriods(game, params.maxResults);
     const periods = mapPeriods(game, raw);
-    // viewPeriod = 傳給 view 的 period 陣列：標準彩種維持 newest→oldest；
-    // 四星彩比對原 controller 多做一次 array_reverse。
+    // viewPeriod：標準彩種維持新→舊；四星彩額外翻轉一次（顯示為舊→新）。
     const viewPeriod = game.digits ? periods.slice().reverse() : periods;
 
     if (game.digits) {

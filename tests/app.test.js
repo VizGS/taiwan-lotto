@@ -8,11 +8,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// ── readParams 依賴 window.location / window.matchMedia；
-//    在 node 環境補最小 stub，讓 require() 不爆炸。
+// ── readParams 讀 window.location.search；node 環境補最小 stub，讓 require() 不爆炸。
 globalThis.window = {
   location: { search: '' },
-  matchMedia: () => ({ matches: false }),
 };
 
 const {
@@ -105,7 +103,7 @@ describe('range1', () => {
 // ── countValues ───────────────────────────────────────────────────────────────
 
 describe('countValues', () => {
-  it('等價 PHP array_count_values：計算每個值出現次數', () => {
+  it('計算每個值的出現次數', () => {
     // Arrange
     const input = [1, 2, 1, 3, 2, 1];
     // Act
