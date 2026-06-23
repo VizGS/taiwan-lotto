@@ -18,6 +18,7 @@ const {
   pad2,
   range1,
   countValues,
+  escapeHtml,
   mapPeriods,
   buildCounts,
   fetchPeriods,
@@ -122,6 +123,41 @@ describe('countValues', () => {
     const result = countValues(['5', '5', '3']);
     expect(result['5']).toBe(2);
     expect(result['3']).toBe(1);
+  });
+});
+
+// ── escapeHtml（全站唯一 XSS 防線）────────────────────────────────────────────
+
+describe('escapeHtml', () => {
+  it('五個危險字元各自轉成對應 entity', () => {
+    expect(escapeHtml('&')).toBe('&amp;');
+    expect(escapeHtml('<')).toBe('&lt;');
+    expect(escapeHtml('>')).toBe('&gt;');
+    expect(escapeHtml('"')).toBe('&quot;');
+    expect(escapeHtml("'")).toBe('&#39;');
+  });
+
+  it('XSS payload 完全轉義，輸出不含原始 < >', () => {
+    const out = escapeHtml('<img src=x onerror=alert(1)>');
+    expect(out).not.toContain('<');
+    expect(out).not.toContain('>');
+    expect(out).toBe('&lt;img src=x onerror=alert(1)&gt;');
+  });
+
+  it('& 先被轉義，不會把後續 entity 二次破壞', () => {
+    expect(escapeHtml('a & b < c')).toBe('a &amp; b &lt; c');
+  });
+
+  it('非字串輸入以 String() 包裝、不丟例外', () => {
+    expect(escapeHtml(539)).toBe('539');
+    expect(escapeHtml(null)).toBe('null');
+    expect(escapeHtml(undefined)).toBe('undefined');
+  });
+
+  it('安全字串（純中文、純數字、期號）原樣輸出', () => {
+    expect(escapeHtml('今彩539')).toBe('今彩539');
+    expect(escapeHtml('115000151')).toBe('115000151');
+    expect(escapeHtml('2026-06-22')).toBe('2026-06-22');
   });
 });
 

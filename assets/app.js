@@ -488,7 +488,7 @@ if (typeof document !== 'undefined') {
 // 匯出供單元測試使用（瀏覽器環境忽略）
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    GAMES, pad2, range1, countValues, mapPeriods, buildCounts,
+    GAMES, pad2, range1, countValues, escapeHtml, mapPeriods, buildCounts,
     fetchPeriods, readParams,
     MAX_RESULTS_CAP, MONTHS_BACK_CAP,
   };
