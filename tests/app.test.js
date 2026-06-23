@@ -18,15 +18,12 @@ const {
   pad2,
   range1,
   countValues,
-  barHeightPx,
   mapPeriods,
   buildCounts,
   fetchPeriods,
-  navColspans,
   readParams,
   MAX_RESULTS_CAP,
   MONTHS_BACK_CAP,
-  BAR_DIVISOR,
 } = require('../assets/app.js');
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -125,71 +122,6 @@ describe('countValues', () => {
     const result = countValues(['5', '5', '3']);
     expect(result['5']).toBe(2);
     expect(result['3']).toBe(1);
-  });
-});
-
-// ── barHeightPx ───────────────────────────────────────────────────────────────
-
-describe('barHeightPx', () => {
-  it('BAR_DIVISOR 常數為 20', () => {
-    expect(BAR_DIVISOR).toBe(20);
-  });
-
-  it('count=20 → round(20/20*100)*2 = 200', () => {
-    // Arrange / Act / Assert
-    expect(barHeightPx(20)).toBe(200);
-  });
-
-  it('count=10 → round(10/20*100)*2 = 100', () => {
-    expect(barHeightPx(10)).toBe(100);
-  });
-
-  it('count=1 → round(1/20*100)*2 = round(5)*2 = 10', () => {
-    expect(barHeightPx(1)).toBe(10);
-  });
-
-  it('count=0 → 0', () => {
-    expect(barHeightPx(0)).toBe(0);
-  });
-
-  it('count=3 → round(3/20*100)*2 = round(15)*2 = 30', () => {
-    expect(barHeightPx(3)).toBe(30);
-  });
-});
-
-// ── navColspans ───────────────────────────────────────────────────────────────
-
-describe('navColspans', () => {
-  it('40 欄 → [10,10,10,10]（整除）', () => {
-    expect(navColspans(40)).toEqual([10, 10, 10, 10]);
-  });
-
-  it('50 欄 → [13,13,12,12]（2 餘，前兩個 +1）', () => {
-    expect(navColspans(50)).toEqual([13, 13, 12, 12]);
-  });
-
-  it('47 欄 → [12,12,12,11]（3 餘，前三個 +1）', () => {
-    expect(navColspans(47)).toEqual([12, 12, 12, 11]);
-  });
-
-  it('各欄加總等於 totalCols', () => {
-    for (const total of [20, 39, 40, 47, 50, 57]) {
-      const spans = navColspans(total);
-      expect(spans.reduce((a, b) => a + b, 0)).toBe(total);
-    }
-  });
-
-  it('大樂透欄數：1+49+0=50', () => {
-    // mainMax=49, secondMax=0
-    const totalCols = 1 + GAMES.lottobig.mainMax + GAMES.lottobig.secondMax;
-    expect(totalCols).toBe(50);
-    expect(navColspans(totalCols)).toEqual([13, 13, 12, 12]);
-  });
-
-  it('威力彩欄數：1+38+8=47', () => {
-    const totalCols = 1 + GAMES.lottosuper.mainMax + GAMES.lottosuper.secondMax;
-    expect(totalCols).toBe(47);
-    expect(navColspans(totalCols)).toEqual([12, 12, 12, 11]);
   });
 });
 

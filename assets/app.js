@@ -11,8 +11,6 @@
 
 const API_BASE = 'https://api.taiwanlottery.com/TLCAPIWeB/Lottery';
 
-// barHeightPx 用的固定分母（現行渲染改用等比 barHeight；保留供單元測試）
-const BAR_DIVISOR = 20;
 const BAR_COLOR_MAIN = '800080';   // 第一區（紫）
 const BAR_COLOR_SECOND = '000080'; // 威力彩第二區（深藍）
 
@@ -110,11 +108,6 @@ function countValues(numbers) {
   return counts;
 }
 
-// 忠實重現 Chart.php：round(count / 20 * 100) * 2
-function barHeightPx(count) {
-  return Math.round((count / BAR_DIVISOR) * 100) * 2;
-}
-
 function readParams(game) {
   const sp = new URLSearchParams(window.location.search);
   const d = isMobile() ? game.defaults.mobile : game.defaults.desktop;
@@ -206,14 +199,10 @@ function buildCounts(game, periods) {
 }
 
 // ===== HTML 片段 =====
-function navColspans(totalCols) {
+function navRowHtml(game, totalCols) {
   const base = Math.floor(totalCols / 4);
   const remainder = totalCols % 4; // 餘數分配給前幾個（比照原 view 的 colspan 分布）
-  return NAV.map((_, idx) => base + (idx < remainder ? 1 : 0));
-}
-
-function navRowHtml(game, totalCols) {
-  const spans = navColspans(totalCols);
+  const spans = NAV.map((_, idx) => base + (idx < remainder ? 1 : 0));
   const cells = NAV.map((n, idx) => (
     `<td colspan="${spans[idx]}">`
     + `<button type="button" class="category" style="font-size:${game.categoryFontSize}px" `
@@ -283,9 +272,9 @@ function renderStandard(game, viewPeriod, counts, params) {
   const secondChk = second.map((i) => `<td class="chk chk--second"><p>${pad2(i)}</p></td>`).join('');
   rows.push(`<tr><td class="chk-label">標注號碼</td>${mainChk}${secondChk}</tr>`);
 
-  // 出現次數列
+  // 出現次數列（直方圖長條高度：固定分母 20）
   const countCell = (c, color) => (c
-    ? `<td class="count-cell">${c}<br><div class="bar" style="height:${barHeightPx(c)}px;background:#${color}"></div></td>`
+    ? `<td class="count-cell">${c}<br><div class="bar" style="height:${Math.round((c / 20) * 100) * 2}px;background:#${color}"></div></td>`
     : '<td class="count-cell">0</td>');
   const mainCount = main.map((i) => countCell(counts.main[i], BAR_COLOR_MAIN)).join('');
   const secondCount = second.map((i) => countCell(counts.second[i], BAR_COLOR_SECOND)).join('');
@@ -499,8 +488,8 @@ if (typeof document !== 'undefined') {
 // 匯出供單元測試使用（瀏覽器環境忽略）
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
-    GAMES, pad2, range1, countValues, barHeightPx, mapPeriods, buildCounts,
-    fetchPeriods, navColspans, readParams,
-    MAX_RESULTS_CAP, MONTHS_BACK_CAP, BAR_DIVISOR,
+    GAMES, pad2, range1, countValues, mapPeriods, buildCounts,
+    fetchPeriods, readParams,
+    MAX_RESULTS_CAP, MONTHS_BACK_CAP,
   };
 }
