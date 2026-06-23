@@ -24,9 +24,6 @@ https://api.taiwanlottery.com/TLCAPIWeB/Lottery/{endpoint}
 ### 查詢參數（query string）
 
 - `max_results`：查詢筆數（預設 20，上限 500）。只有此參數改變才重新向 API 取資料。
-- `size` / `width` / `height`：字級與表格寬高，純顯示用，即時套用、不重新取資料。
-
-未指定時依裝置（`matchMedia`）給預設值，等同原本後端的 `is_mobile()` 判斷。
 
 ## 檔案結構
 
