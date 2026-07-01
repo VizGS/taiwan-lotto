@@ -297,8 +297,8 @@ describe('fetchPeriods：終止守衛 regression', () => {
     vi.unstubAllGlobals();
   });
 
-  it('[守衛 a] 所有月份回空陣列 → 回 []，fetch 只被呼叫 1 次', async () => {
-    // Arrange：第一次 fetch 就回空陣列，後續不應再呼叫
+  it('[守衛 a] 所有月份皆空 → 回 []，且往前翻不超過 MONTHS_BACK_CAP 次（不無限迴圈）', async () => {
+    // Arrange：每個月都回空陣列（模擬該彩種完全無歷史 / API 全空）
     const mockFetch = makeFetchMock(game, [[]]);
     vi.stubGlobal('fetch', mockFetch);
 
@@ -307,8 +307,32 @@ describe('fetchPeriods：終止守衛 regression', () => {
 
     // Assert
     expect(result).toEqual([]);
-    // 空月份即 break → 只呼叫 1 次，不可無限迴圈
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    // 一筆都沒抓到的空月份不可當歷史起點而中斷，須續往前翻，
+    // 但受 MONTHS_BACK_CAP 硬上限保護，不會無限迴圈。
+    expect(mockFetch).toHaveBeenCalledTimes(MONTHS_BACK_CAP);
+  });
+
+  it('[跨月 regression] 當月空、前一月有資料 → 不因當月空而中斷，正確回前一月資料', async () => {
+    // Arrange：模擬月初剛跨月 —— 當月（第 1 次 fetch）尚無開獎回空，
+    //          前一月（第 2 次 fetch）有 20 筆。
+    //          修正前：當月空月即 break → 回 0 筆（bug）。
+    const twentyItems = Array.from({ length: 20 }, (_, i) =>
+      makeItem(`P${i}`, `2024-06-${String((i % 28) + 1).padStart(2, '0')}T00:00:00`, [1, 2, 3, 4, 5])
+    );
+    const responses = [
+      [],          // 當月：跨月後尚無開獎
+      twentyItems, // 前一月：20 筆
+    ];
+    const mockFetch = makeFetchMock(game, responses);
+    vi.stubGlobal('fetch', mockFetch);
+
+    // Act
+    const result = await fetchPeriods(game, 20);
+
+    // Assert：不因當月空而回 0 筆，正確抓到前一月 20 筆
+    expect(result).toHaveLength(20);
+    // 當月空（跳過）+ 前一月抓滿 → 共呼叫 2 次
+    expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
   it('[守衛 b] MONTHS_BACK_CAP 硬上限為 60', () => {

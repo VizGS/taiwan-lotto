@@ -153,7 +153,15 @@ async function fetchPeriods(game, maxResults) {
     const monthData = await fetchMonth(game, month, remaining);
 
     if (monthData.length === 0) {
-      break; // 空月份 → 已到歷史起點，停止（終止守衛，防無限迴圈）
+      // 已抓到資料後才遇空月份 → 到達歷史起點，停止（終止守衛）。
+      // 若一筆都還沒抓到就遇空月份，代表當月剛跨月、本月尚無開獎，
+      // 不可停止，須續往前一個月抓，否則月初查詢會回 0 筆。
+      if (raw.length > 0) {
+        break;
+      }
+      cursor.setMonth(cursor.getMonth() - 1);
+      monthsWalked += 1;
+      continue;
     }
 
     raw.push(...monthData);
