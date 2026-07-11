@@ -162,14 +162,23 @@ th {
 }
 
 /* ===== 四星彩專屬 ===== */
+/* 固定欄寬：預設 auto-layout 會依內容分配欄寬，導致彩種切換鈕中較寬的
+ * 「今彩539」把該欄撐得比其他欄寬，連帶標注號碼／開獎號碼各欄大小不一。
+ * table-layout: fixed 讓 4 個號碼欄一律吃同一寬度而彼此等寬。 */
+.lotto4 {
+  table-layout: fixed;
+}
+
+/* 維持 100px 字級不變，改為量測單一數字在該字級下的實際 line-box
+ * （約112px高、56px寬），取120px為正方形邊長，上下各留約4px不裁切 */
 .lotto4 thead th {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
 }
 
 .lotto4 tbody td {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   white-space: nowrap;
   position: relative;
 }
