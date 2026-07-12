@@ -170,10 +170,15 @@ th {
 }
 
 /* 維持 100px 字級不變，改為量測單一數字在該字級下的實際 line-box
- * （約112px高、56px寬），取120px為正方形邊長，上下各留約4px不裁切 */
+ * （約112px高、56px寬），取120px為正方形邊長，上下各留約4px不裁切。
+ * 期號欄（文字標籤，非數字）不需要正方形，另給較窄寬度避免浪費版面。 */
 .lotto4 thead th {
   width: 120px;
   height: 120px;
+}
+
+.lotto4 thead th:first-child {
+  width: 90px;
 }
 
 .lotto4 tbody td {
@@ -181,6 +186,21 @@ th {
   height: 120px;
   white-space: nowrap;
   position: relative;
+}
+
+.lotto4 .chk-label,
+.lotto4 .period-cell {
+  width: 90px;
+}
+
+/* 手機寬度塞不下「90 + 4×120」的表格寬度時，整張表用 transform 等比縮小
+ * 到能完整顯示 4 欄不需橫向捲動；font-size 屬性本身維持 100px 不變，
+ * 只是視覺呈現縮小（等同放大鏡效果），不影響量測 line-box 用的字級基準。 */
+@media (max-width: 600px) {
+  .lotto4 {
+    transform: scale(0.62);
+    transform-origin: top left;
+  }
 }
 
 .digit-cell {
